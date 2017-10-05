@@ -1,0 +1,38 @@
+(\(.*\))   
+REMARK_BEGIN\1REMARK_END
+
+(Пор\..*)
+REMARK_BEGIN\1REMARK_END
+
+Correction of
+Вар.
+
+Correction of
+Варіянт
+
+Correction:
+END_TITLE\D+[a-z|A-Z]+
+Add for prypovistok without numbers 9999.
+
+Correction of
+Move not handled remarks    
+
+
+(REMARK_BEGIN.*)(\d+)\.(.*REMARK_END) ->
+\1\2DOT \3
+
+ (Пор\..+)$ ->
+REMARK_BEGIN \1 REMARK_END
+
+\1 SOURCE_BEGIN SOURCE_END
+
+:REMARK_END
+Extend remark with sample text
+
+
+
+(\d+)\.(\W*REMARK_END) ->
+\1DOT \2
+
+(\d+\.) ->
+PHRASE_TEXT \1
