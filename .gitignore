@@ -1,0 +1,16 @@
+*.cache
+/NET/PhraseArticlesParser/.vs/PhraseArticlesParser/v14/*.suo
+/NET/CreateTestData/CreateTestData/bin
+/NET/CreateTestData/CreateTestData/obj
+/NET/HotelFinder/HotelFinder/bin
+/NET/HotelFinder/HotelFinder/obj
+/NET/MarkExcuseTactics/bin
+/NET/MarkExcuseTactics/obj
+/NET/PhotoEditor/PhotoEditor/obj
+/NET/PhotoEditor/PhotoEditor/bin
+/NET/PhraseArticlesParser/PhraseArticlesParser/obj
+/NET/PhraseArticlesParser/PhraseArticlesParser/bin
+/NET/SantechinaSucher/ConsoleApplication2/obj
+/NET/SantechinaSucher/ConsoleApplication2/bin
+*.suo
+*.user
