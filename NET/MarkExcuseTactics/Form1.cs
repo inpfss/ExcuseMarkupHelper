@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -52,142 +54,40 @@ namespace MarkExcuseTactics
             tacticList.ValueMember = nameof(Tactic.Id);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void LoadExcusesFromFile_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 excusesFilePath = openFileDialog1.FileName;
-                ReadExcusesFile(excusesFilePath);
+
+               _excuses = new ExcusesXmlReader().LoadFromFile(excusesFilePath, _tactics);
+
+                excusesBindingSource = new BindingSource(_excuses, null);
+                excuseList.DataSource = excusesBindingSource;
+                
+                saveSentencTacticseBtn.Enabled=
+                saveExcusesToFileBtn.Enabled = 
+                editSentBtn.Enabled=
+                editExcuseBtn.Enabled = true;
             }
-        }
-
-        private void ReadExcusesFile(string fileName)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(fileName);
-            _excuses = new List<Excuse>();
-            foreach (XmlNode node in doc.DocumentElement.ChildNodes.Cast<XmlNode>())
-            {
-                IEnumerable<XmlNode> children = node.ChildNodes.Cast<XmlNode>();
-                string value = children.FirstOrDefault(n => n.Name == "id")?.InnerXml;
-                if (value != null)
-                {
-                    var excuse = new Excuse()
-                    {
-                        Name = value.Trim(),
-                        OriginalExcuseText = children.FirstOrDefault(n => n.Name == "text")?
-                                .InnerXml?.Trim(),
-                    };
-
-                    List<XmlNode> sentencesNodes = children.FirstOrDefault(n => n.Name == "sentences")
-                        .ChildNodes.Cast<XmlNode>().Where(n => n.Name == "sentence").ToList();
-
-                    List<string> sents = new List<string>();
-                    for (var i = 0; i < sentencesNodes.Count; i++)
-                    {
-                        XmlNode sentenceNode = sentencesNodes[i];
-                        if (sentenceNode == null)
-                        {
-                            continue;
-                        }
-
-                        string sentenceText = sentencesNodes[i]
-                            .ChildNodes.Cast<XmlNode>()
-                            .FirstOrDefault(n => n.Name == "text")?.InnerXml.Trim();
-                        if (string.IsNullOrWhiteSpace(sentenceText))
-                        {
-                            continue;
-                        }
-
-                        sents.Add(sentenceText);
-                        XmlNode tacticsNode = sentenceNode.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == "tactics");
-                        if (tacticsNode != null)
-                        {
-                            int x;
-                            List<int> tacticsIds = tacticsNode
-                                .ChildNodes.Cast<XmlNode>()
-                                .Where(n => n.Name == "tacticId")
-                                .Select(tactic => tactic.InnerXml?.Trim())
-                                .Where(tId => !string.IsNullOrWhiteSpace(tId) && int.TryParse(tId, out x))
-                                .Select(int.Parse)
-                                .ToList();
-
-                            List<Tactic> tactics = tacticsIds.Select(tId =>
-                                _tactics.FirstOrDefault(t => t.Id == tId))
-                                .ToList();
-
-                            excuse.SentenceTactics[sents.Count - 1] = tactics;
-                        }
-
-                        excuse.Sentences = sents.ToArray();
-                    }
-
-                    _excuses.Add(excuse);
-                }
-            }
-
-            excuseList.DataSource = _excuses;
-            excuseList.DisplayMember = nameof(Excuse.SafeName);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                SaveResults(saveFileDialog1.FileName);
+                new ExcusesXmlWriter().WriteToFile(saveFileDialog1.FileName, _excuses);
             }
         }
 
-        private void SaveResults(string fileName)
-        {
-            using (var sw = File.CreateText(fileName))
-            {
-                sw.WriteLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
-                sw.WriteLine("<excuses>");
-                foreach (Excuse excuse in _excuses)
-                {
-                    try
-                    {
-                        sw.WriteLine("<excuse>");
-                        sw.WriteLine("<id>");
-                        if (!string.IsNullOrWhiteSpace(excuse.Name))
-                        {
-                            sw.WriteLine(excuse.Name);
-                        }
-                        sw.WriteLine("</id>");
-                        sw.WriteLine($"<text>{excuse.OriginalExcuseText}</text>");
-
-                        sw.WriteLine("<sentences>");
-                        for (int sentenceIndex = 0; sentenceIndex < excuse.Sentences.Length; sentenceIndex++)
-                        {
-                            sw.WriteLine("<sentence>");
-                            sw.WriteLine($"<text>{excuse.Sentences[sentenceIndex]}</text>");
-                            if (excuse.SentenceTactics != null && excuse.SentenceTactics.ContainsKey(sentenceIndex))
-                            {
-                                sw.WriteLine("<tactics>");
-                                excuse.SentenceTactics[sentenceIndex].ForEach(tactic =>
-                                    sw.WriteLine($"<tacticId>{tactic.Id}</tacticId>"));
-                                sw.WriteLine("</tactics>");
-                            }
-                            sw.WriteLine("</sentence>");
-                        }
-                        sw.WriteLine("</sentences>");
-                        sw.WriteLine("</excuse>");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                }
-                sw.WriteLine("</excuses>");
-            }
-        }
 
         private void excuseList_SelectedIndexChanged(object sender, EventArgs e)
         {
             Excuse ex = excuseList.SelectedItem as Excuse;
-            excuseBox.Lines = ex.Sentences;
-            sentenceList.DataSource = ex.Sentences;
+            sentencesBindingSource = new BindingSource(ex.Sentences, null);
+            sentenceList.DataSource = sentencesBindingSource;
+
+            excuseBox.Text = ex.ExcuseText;
         }
 
         private void sentenceList_SelectedIndexChanged(object sender, EventArgs e)
@@ -236,5 +136,182 @@ namespace MarkExcuseTactics
                                 fontDialog1.Font;
             }
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (sentenceList.SelectedIndices.Count == 1)
+            {
+                EnterEditMode(EditMode.Sentence);
+            }
+        }
+
+       
+
+        private void sentenceBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return)
+            {
+                int position = sentenceBox.SelectionStart + 4;
+                sentenceBox.Text = sentenceBox.Text.Insert(sentenceBox.SelectionStart, "<br>");
+                sentenceBox.SelectionStart = position;
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string[] sents = sentenceBox.Text.Split(new[] { "<br>" },
+                StringSplitOptions.RemoveEmptyEntries);
+            Excuse editExcuse = excuseList.SelectedItem as Excuse;
+            int editedSentenceId = sentenceList.SelectedIndex;
+            editExcuse.SaveSplittedSentence(editedSentenceId, sents);
+
+            excuseBox.Text = editExcuse.ExcuseText;
+
+            ExitFromEditMode(EditMode.Sentence);
+        }
+
+       
+        private void RunCmd(string cmd, string args)
+        {
+            ProcessStartInfo start = new ProcessStartInfo();
+            start.FileName = cmd;
+            start.Arguments = args;
+            start.WindowStyle = ProcessWindowStyle.Hidden;
+            start.UseShellExecute = false;
+            start.RedirectStandardOutput = true;
+            using (Process process = Process.Start(start))
+            {
+                using (StreamReader reader = process.StandardOutput)
+                {
+                    string result = reader.ReadToEnd();
+                    Console.Write(result);
+                }
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                if (saveSentBtn.Enabled)
+                {
+                    int editedSentenceId = sentenceList.SelectedIndex;
+                    ExitFromEditMode(EditMode.Sentence);
+                    sentenceList.SelectedIndex = editedSentenceId;
+                    sentenceList.Focus();
+
+                    return true;
+                }
+                if (saveExcuseBtn.Enabled)
+                {
+                    int editedExcuseId = excuseList.SelectedIndex;
+                    ExitFromEditMode(EditMode.Excuse);
+                    excuseList.SelectedIndex = editedExcuseId;
+                    excuseList.Focus();
+
+                    return true;
+                }
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void saveExcuseBtn_Click(object sender, EventArgs e)
+        {
+            string excuseText = excuseBox.Text;
+            Excuse excuse = excuseList.SelectedItem as Excuse;
+            excuse.ExcuseText = excuseText;
+            excuse.Sentences = new List<string>();
+            excuse.SentenceTactics = new Dictionary<int, List<Tactic>>();
+
+            string pathExcuse = Path.Combine(Environment.CurrentDirectory, "tempExcuse.xml");
+            new ExcusesXmlWriter().WriteToFile(pathExcuse, new List<Excuse>() { excuse });
+
+            string processedExcuse = Path.Combine(Environment.CurrentDirectory, "proced.xml");
+            string splittingScriptPath = ConfigurationManager.AppSettings["pythonSplitScriptPath"];
+            string pythonPath = ConfigurationManager.AppSettings["pythonPath"];
+            string args =$@"""{splittingScriptPath}"" ""{pathExcuse}"" ""{processedExcuse}""";
+
+            RunCmd(pythonPath, args);
+
+            List<Excuse> templList =  new ExcusesXmlReader().LoadFromFile(processedExcuse, _tactics);
+            if (templList?.Count == 1)
+            {
+                Excuse updatedExcuse = templList[0];
+                _excuses[excuseList.SelectedIndex] = updatedExcuse;
+
+                ExitFromEditMode(EditMode.Excuse);
+                excuseList.SelectedIndex = excuseList.SelectedIndex;
+                excuseList_SelectedIndexChanged(null, null);
+                excuseList.Focus();
+            }
+
+        }
+
+        private void editExcuseBtn_Click(object sender, EventArgs e)
+        {
+            EnterEditMode(EditMode.Excuse);
+        }
+
+        private void EnterEditMode(EditMode editMode)
+        {
+            editSentBtn.Enabled =
+            editExcuseBtn.Enabled =
+            saveExcuseBtn.Enabled =
+            saveExcusesToFileBtn.Enabled =
+            saveSentencTacticseBtn.Enabled =
+            sentenceBox.ReadOnly =
+            excuseList.Enabled =
+            sentenceList.Enabled = false;
+
+            if (editMode == EditMode.Sentence)
+            {
+                saveSentBtn.Enabled = true;
+                excuseBox.ReadOnly = false;
+                sentenceBox.BackColor = Color.White;
+
+                sentenceBox.Focus();
+            }
+            else if (editMode == EditMode.Excuse)
+            {
+                saveExcuseBtn.Enabled = true;
+                excuseBox.ReadOnly = false;
+                excuseBox.BackColor = Color.White;
+
+                excuseBox.Focus();
+            }
+        }
+
+        private void ExitFromEditMode(EditMode editMode)
+        {
+            editSentBtn.Enabled =
+            editExcuseBtn.Enabled =
+            saveExcusesToFileBtn.Enabled =
+            saveSentencTacticseBtn.Enabled =
+            sentenceBox.ReadOnly =
+            excuseList.Enabled =
+            sentenceList.Enabled = true;
+
+            if (editMode == EditMode.Sentence)
+            {
+                sentenceBox.ReadOnly = true;
+                saveSentBtn.Enabled = false;
+                sentenceBox.BackColor = BackColor;
+
+                sentencesBindingSource.ResetBindings(false);
+                sentenceList.Focus();
+            }
+            else if (editMode == EditMode.Excuse)
+            {
+                saveExcuseBtn.Enabled = false;
+                excuseBox.ReadOnly = true;
+                excuseBox.BackColor = BackColor;
+
+                excusesBindingSource.ResetBindings(false);
+
+                excuseList.Focus();
+            }
+        }
+
     }
 }
