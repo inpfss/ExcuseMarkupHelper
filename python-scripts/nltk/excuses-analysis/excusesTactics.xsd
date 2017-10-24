@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema  elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.nltk.com">
+	<xs:element name="excusesTactics">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="tacticIndices" maxOccurs="1" minOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="tactic" maxOccurs="unbounded" minOccurs="1">
+								<xs:complexType>
+									<xs:attribute type="xs:byte" name="index" use="required"/>
+									<xs:attribute type="xs:string" name="name" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="excuses" maxOccurs="1" minOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="excuse" maxOccurs="unbounded" minOccurs="1">
+								<xs:complexType mixed="true">
+									<xs:all>
+										<xs:element type="xs:integer" name="id" maxOccurs="1" minOccurs="1"/>
+										<xs:element type="xs:string" name="name" maxOccurs="1" minOccurs="1"/>
+										<xs:element name="country" maxOccurs="1" minOccurs="1">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element type="xs:string" name="author" maxOccurs="1" minOccurs="1"/>
+										<xs:element type="xs:string" name="gender" maxOccurs="1" minOccurs="1"/>
+										<xs:element name="date" maxOccurs="1" minOccurs="1">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="text" maxOccurs="1" minOccurs="1">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element type="xs:string" name="additionalInformation" maxOccurs="1" minOccurs="1"/>
+										<xs:element name="communicativeTactics" maxOccurs="1" minOccurs="1">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="communicativeTactic" maxOccurs="unbounded" minOccurs="2">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="text" maxOccurs="1" minOccurs="1">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute type="xs:byte" name="tacticIndex" use="required"/>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="sources" maxOccurs="1" minOccurs="1">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element type="xs:string" name="source" maxOccurs="unbounded" minOccurs="1"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

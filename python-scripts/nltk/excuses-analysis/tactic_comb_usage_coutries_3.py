@@ -1,58 +1,52 @@
-'''
+"""
 How are combined communication tactics most often in the US, UK or Canada;
-'''
+"""
 
+# statistic class
+from nltk import ConditionalFreqDist
+# import our helper class to access excuses data from XML tree
+from excuses_helper import ExcusesHelper
+# statistic class
+from nltk import FreqDist
 
-import xml.etree.ElementTree as eT
-from nltk.corpus.reader import XMLCorpusReader
-from nltk.probability import FreqDist
-from nltk.probability import ConditionalFreqDist
+# need in order to read correctly excuses file in UTF-8 encoding
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+# create instance of helper
+excuseHelper = ExcusesHelper()
+# for creating combinations of tactics
 import itertools
-from matplotlib import pylab
 
+# will contains all used combinations of tactics in all excuses
+tactics_combination_list = []
+# iterate through all communicativeTactics elements in XML
+for excuse in excuseHelper.get_all_excuse_elements():
+    # get country
+    country = excuse.find('country').text
+    # build list of used tactics indices in current excuse
+    excuse_tactic_indices = ExcusesHelper.get_used_tactic_indices(excuse)
+    # if in excuse are used more then one tactic
+    # then we will save in list all possible combinations that we can deduce current combination
+    # for example: (1, 4, 6) -> it covers following combinations
+    # (1,4,6); (1,4); (1,6); (4,6)
+    if len(excuse_tactic_indices) >= 2:
+        # we want to get combination with length >= 2
+        # we pass len(excuseTacticIndices) + 1, because range returns n elements starting from 0
+        for combinationLength in range(2, len(excuse_tactic_indices) + 1):
+            # now we use itertools to produce all combinations without repetitions
+            combinations = list(itertools.combinations(excuse_tactic_indices, combinationLength))
+            # add pair country and combination to the list
+            tactics_combination_list += [(country, c) for c in combinations]
 
-reader = XMLCorpusReader('', 'ExcusesSample.xml')
-root = eT.fromstring(reader.raw())
+# build frequence usage of tactics
+tactic_comb_dist = ConditionalFreqDist(tactics_combination_list)
 
-tacticsListSorted = sorted(set([tactic.find('name').text for tactic in root.findall('./excuse/tactics/tactic')]))
-
-
-def getMostUsedTacticCombinationsInCountry( countryName ):
-    tacticsCombinationList = []
-    for excuse in root.findall('./excuse'):
-        if not excuse.find('country').text == countryName: continue
-
-        excuseTacticNames = sorted([tactic.find('name').text for tactic in excuse.findall('tactics/tactic')])
-        tacticIndexies = sorted([tacticsListSorted.index(name) for name in excuseTacticNames])
-        if len(excuseTacticNames) >= 2:
-            for combinationLength in range(2, len(tacticIndexies) + 1):
-                tacticsCombinationList += tuple(itertools.combinations(tacticIndexies, combinationLength))
-
-    dic = FreqDist(sorted(tacticsCombinationList))
-    dic.plot(title='Most frequently used tactic combination for {0}'.format(countryName))
-    return tacticsCombinationList
-
-def getMostUsedTacticCombinations():
-    tacticsCombinationList = []
-    for excuse in root.findall('./excuse'):
-        countryName = excuse.find('country').text
-        excuseTacticNames = sorted([tactic.find('name').text for tactic in excuse.findall('tactics/tactic')])
-        tacticIndexies = sorted([tacticsListSorted.index(name) for name in excuseTacticNames])
-        if len(excuseTacticNames) >= 2:
-            for combinationLength in range(2, len(tacticIndexies) + 1):
-                for comb in itertools.combinations(tacticIndexies, combinationLength):
-                    tacticsCombinationList.append((countryName, comb))
-                    tacticsCombinationList.append(('all', comb))
-
-    dic = ConditionalFreqDist(tacticsCombinationList)
-    dic.plot(title='Most frequently used tactic combination in countries')
-    return
-
-for tacticName in tacticsListSorted:
-    print('{0}: {1}'.format(tacticsListSorted.index(tacticName), tacticName))
-
-
-#getMostUsedTacticCombinationsInCountry('USA')
-#getMostUsedTacticCombinationsInCountry('UK')
-#getMostUsedTacticCombinationsInCountry('Canada')
-getMostUsedTacticCombinations()
+# get all country names mentioned in excuses
+countries = excuseHelper.get_author_countries()
+for country in countries:
+    # plot results
+    tactic_comb_dist[country].plot(title='How are combined communication tactics most often in {0}'.format(country))
+    print('Total count of tactics combination for {0}: {1}'.format(country, tactic_comb_dist[country].N()))
+    print('Count of unique tactic combination for {0}: {1}'.format(country, tactic_comb_dist[country].B()))

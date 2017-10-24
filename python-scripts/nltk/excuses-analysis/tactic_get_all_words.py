@@ -1,34 +1,41 @@
-'''
-Які слова (sorry, apologize, mistake, responsibility, irresponsible, fail etc.)
-є найбільш характерними для кожної комунікативної тактики
-'''
+"""
+Get alphabetic ordered list of all words that were used in excuses
+"""
 
-import xml.etree.ElementTree as eT
-from nltk.corpus.reader import XMLCorpusReader
+# need in order to read correctly excuses file in UTF-8 encoding
+import sys
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+# statistic class
+# for splitting text into words
+from nltk import word_tokenize, FreqDist
+# import our helper class to access excuses data from XML tree
+from excuses_helper import ExcusesHelper
+# puctuation
 import string
-import nltk
-from nltk.probability import FreqDist
-from nltk import word_tokenize
 
+# punctuations symbols for splitting text to words
 punctuations = string.punctuation
-reader = XMLCorpusReader('', 'ExcusesSample.xml')
-root = eT.fromstring(reader.raw())
+# create instance of helper
+excuseHelper = ExcusesHelper()
+# list of all words
+words = []
+# iterate through all excuses's tactics
+for tactic in excuseHelper.get_tactics_elements():
+    # get text of this tactic element
+    tacticText = tactic.find('text').text
+    # split text to words, skip punctuation, add them to list
+    words += [word for word in word_tokenize(tacticText) if word not in punctuations]
 
-tacticsDict = dict()
-for tactic in root.findall('./excuse/tactics/tactic'):
-    tacticName = tactic.find('name').text
-    tacticExcuse = tactic.find('text').text
-    if not tacticName in tacticsDict.keys():
-        tacticsDict[tacticName] = []
-    tacticsDict[tacticName].append(tacticExcuse)
 
-tactictsWordsFreq = dict()
-for tacticName in tacticsDict:
-    tacticExcusesMerged = ' '.join(tacticsDict[tacticName])
-    tacticWords = [i for i in word_tokenize(tacticExcusesMerged) if i not in punctuations]
-    tactictsWordsFreq[tacticName] = FreqDist(tacticWords)
+dic = FreqDist(words)
+dic.tabulate()
 
-for tacticName in tactictsWordsFreq:
-    print(tacticName)
-    print(tactictsWordsFreq[tacticName].max())
-    tactictsWordsFreq[tacticName].plot()
+print(dic.N())
+print(dic.B())
+#
+# # display unique words in alphabetic order
+# for w in sorted(set(words)):
+#     print(w)
