@@ -13,16 +13,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using ExcusesCoreLogic;
 
 namespace MarkExcuseTactics
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private string excusesFilePath;
         List<Excuse> _excuses = new List<Excuse>();
         List<Tactic> _tactics = new List<Tactic>();
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             LoadTactics();
@@ -43,14 +44,14 @@ namespace MarkExcuseTactics
                         return new Tactic()
                         {
                             Id = id,
-                            Name = $"{id + 1}. {name}"
+                            Name = name
                         };
                     }
                     return null;
                 }).ToList();
 
             tacticList.DataSource = _tactics;
-            tacticList.DisplayMember = nameof(Tactic.Name);
+            tacticList.DisplayMember = nameof(Tactic.Label);
             tacticList.ValueMember = nameof(Tactic.Id);
         }
 
@@ -76,7 +77,7 @@ namespace MarkExcuseTactics
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                new ExcusesXmlWriter().WriteToFile(saveFileDialog1.FileName, _excuses);
+                new ExcusesXmlWriter().WriteToFile(saveFileDialog1.FileName, _excuses, _tactics);
             }
         }
 
@@ -225,7 +226,7 @@ namespace MarkExcuseTactics
             excuse.SentenceTactics = new Dictionary<int, List<Tactic>>();
 
             string pathExcuse = Path.Combine(Environment.CurrentDirectory, "tempExcuse.xml");
-            new ExcusesXmlWriter().WriteToFile(pathExcuse, new List<Excuse>() { excuse });
+            new ExcusesXmlWriter().WriteToFile(pathExcuse, new List<Excuse>() { excuse }, _tactics);
 
             string processedExcuse = Path.Combine(Environment.CurrentDirectory, "proced.xml");
             string splittingScriptPath = ConfigurationManager.AppSettings["pythonSplitScriptPath"];
@@ -313,5 +314,12 @@ namespace MarkExcuseTactics
             }
         }
 
+        private void mergeSentsTactsBtn_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                new ExcusesXmlWriter().WriteToFile(saveFileDialog1.FileName, _excuses, _tactics);
+            }
+        }
     }
 }

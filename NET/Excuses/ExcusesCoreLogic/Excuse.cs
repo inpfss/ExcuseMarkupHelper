@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace MarkExcuseTactics
+namespace ExcusesCoreLogic
 {
     public class Excuse
     {
@@ -32,11 +32,29 @@ namespace MarkExcuseTactics
         public List<string> Sentences { get; set; }
         public Dictionary<int, List<Tactic>> SentenceTactics { get; set; }
 
+        public Dictionary<Tactic, List<int>> GetTacticSentences()
+        {
+            var result = new Dictionary<Tactic, List<int>>();
+            foreach (KeyValuePair<int, List<Tactic>> sentenceTactic in SentenceTactics)
+            {
+                foreach (Tactic tactic in sentenceTactic.Value)
+                {
+                    if (!result.ContainsKey(tactic))
+                    {
+                        result[tactic] = new List<int>();
+                    }
+                    result[tactic].Add(sentenceTactic.Key);
+                }
+            }
+
+            return result;
+        }
+
         public string SaveSentenceChangesInExcuseText()
         {
             ExcuseText = string.Join(" ", Sentences);
             return ExcuseText;
-        }
+        } 
 
         public override string ToString() { return SafeName; }
 

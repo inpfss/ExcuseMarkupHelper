@@ -63,5 +63,9 @@
   <tactic>
     <id>15</id>
     <name>Acknowledgement of the fact that the apology recipient is aggrieved person)</name>
+  </tactic> 
+  <tactic>
+    <id>16</id>
+    <name>Тактика вираження того, що адресат себе почуває дуже погано і цим ніби вже покараний.</name>
   </tactic>
 </tactics>

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MarkExcuseTactics
+namespace ExcusesCoreLogic
 {
     public interface IExcuseXmlReader
     {

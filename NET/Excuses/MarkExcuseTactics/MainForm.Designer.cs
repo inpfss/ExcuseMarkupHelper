@@ -1,6 +1,6 @@
 ﻿namespace MarkExcuseTactics
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -41,6 +41,10 @@
             this.saveSentBtn = new System.Windows.Forms.Button();
             this.editSentBtn = new System.Windows.Forms.Button();
             this.sentenceBox = new System.Windows.Forms.RichTextBox();
+            this.splitContainer5 = new System.Windows.Forms.SplitContainer();
+            this.saveExcuseBtn = new System.Windows.Forms.Button();
+            this.editExcuseBtn = new System.Windows.Forms.Button();
+            this.excuseBox = new System.Windows.Forms.RichTextBox();
             this.sentenceList = new System.Windows.Forms.ListBox();
             this.excuseList = new System.Windows.Forms.ListBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -48,10 +52,7 @@
             this.tacticList = new System.Windows.Forms.ListBox();
             this.fontDialog1 = new System.Windows.Forms.FontDialog();
             this.sentencesBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.splitContainer5 = new System.Windows.Forms.SplitContainer();
-            this.excuseBox = new System.Windows.Forms.RichTextBox();
-            this.editExcuseBtn = new System.Windows.Forms.Button();
-            this.saveExcuseBtn = new System.Windows.Forms.Button();
+            this.mergeSentsTactsBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -65,15 +66,15 @@
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
+            this.splitContainer5.Panel1.SuspendLayout();
+            this.splitContainer5.Panel2.SuspendLayout();
+            this.splitContainer5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sentencesBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
-            this.splitContainer5.Panel1.SuspendLayout();
-            this.splitContainer5.Panel2.SuspendLayout();
-            this.splitContainer5.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -107,6 +108,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.mergeSentsTactsBtn);
             this.splitContainer1.Panel1.Controls.Add(this.button5);
             this.splitContainer1.Panel1.Controls.Add(this.saveExcusesToFileBtn);
             this.splitContainer1.Panel1.Controls.Add(this.button1);
@@ -231,6 +233,59 @@
             this.sentenceBox.Text = "";
             this.sentenceBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.sentenceBox_KeyUp);
             // 
+            // splitContainer5
+            // 
+            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer5.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer5.IsSplitterFixed = true;
+            this.splitContainer5.Location = new System.Drawing.Point(5, 5);
+            this.splitContainer5.Name = "splitContainer5";
+            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer5.Panel1
+            // 
+            this.splitContainer5.Panel1.Controls.Add(this.saveExcuseBtn);
+            this.splitContainer5.Panel1.Controls.Add(this.editExcuseBtn);
+            // 
+            // splitContainer5.Panel2
+            // 
+            this.splitContainer5.Panel2.Controls.Add(this.excuseBox);
+            this.splitContainer5.Size = new System.Drawing.Size(401, 377);
+            this.splitContainer5.SplitterDistance = 56;
+            this.splitContainer5.TabIndex = 0;
+            // 
+            // saveExcuseBtn
+            // 
+            this.saveExcuseBtn.Enabled = false;
+            this.saveExcuseBtn.Location = new System.Drawing.Point(180, 9);
+            this.saveExcuseBtn.Name = "saveExcuseBtn";
+            this.saveExcuseBtn.Size = new System.Drawing.Size(139, 38);
+            this.saveExcuseBtn.TabIndex = 4;
+            this.saveExcuseBtn.Text = "Зберегти вибачення";
+            this.saveExcuseBtn.UseVisualStyleBackColor = true;
+            this.saveExcuseBtn.Click += new System.EventHandler(this.saveExcuseBtn_Click);
+            // 
+            // editExcuseBtn
+            // 
+            this.editExcuseBtn.Enabled = false;
+            this.editExcuseBtn.Location = new System.Drawing.Point(13, 9);
+            this.editExcuseBtn.Name = "editExcuseBtn";
+            this.editExcuseBtn.Size = new System.Drawing.Size(139, 38);
+            this.editExcuseBtn.TabIndex = 4;
+            this.editExcuseBtn.Text = "Редагувати вибачення";
+            this.editExcuseBtn.UseVisualStyleBackColor = true;
+            this.editExcuseBtn.Click += new System.EventHandler(this.editExcuseBtn_Click);
+            // 
+            // excuseBox
+            // 
+            this.excuseBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.excuseBox.Location = new System.Drawing.Point(0, 0);
+            this.excuseBox.Name = "excuseBox";
+            this.excuseBox.ReadOnly = true;
+            this.excuseBox.Size = new System.Drawing.Size(401, 317);
+            this.excuseBox.TabIndex = 1;
+            this.excuseBox.Text = "";
+            // 
             // sentenceList
             // 
             this.sentenceList.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -299,67 +354,24 @@
             this.tacticList.Size = new System.Drawing.Size(306, 389);
             this.tacticList.TabIndex = 1;
             // 
-            // splitContainer5
+            // mergeSentsTactsBtn
             // 
-            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer5.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer5.IsSplitterFixed = true;
-            this.splitContainer5.Location = new System.Drawing.Point(5, 5);
-            this.splitContainer5.Name = "splitContainer5";
-            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.mergeSentsTactsBtn.Location = new System.Drawing.Point(257, 17);
+            this.mergeSentsTactsBtn.Name = "mergeSentsTactsBtn";
+            this.mergeSentsTactsBtn.Size = new System.Drawing.Size(194, 23);
+            this.mergeSentsTactsBtn.TabIndex = 3;
+            this.mergeSentsTactsBtn.Text = "Об\'єднати речення у тактиках";
+            this.mergeSentsTactsBtn.UseVisualStyleBackColor = true;
+            this.mergeSentsTactsBtn.Click += new System.EventHandler(this.mergeSentsTactsBtn_Click);
             // 
-            // splitContainer5.Panel1
-            // 
-            this.splitContainer5.Panel1.Controls.Add(this.saveExcuseBtn);
-            this.splitContainer5.Panel1.Controls.Add(this.editExcuseBtn);
-            // 
-            // splitContainer5.Panel2
-            // 
-            this.splitContainer5.Panel2.Controls.Add(this.excuseBox);
-            this.splitContainer5.Size = new System.Drawing.Size(401, 377);
-            this.splitContainer5.SplitterDistance = 56;
-            this.splitContainer5.TabIndex = 0;
-            // 
-            // excuseBox
-            // 
-            this.excuseBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.excuseBox.Location = new System.Drawing.Point(0, 0);
-            this.excuseBox.Name = "excuseBox";
-            this.excuseBox.ReadOnly = true;
-            this.excuseBox.Size = new System.Drawing.Size(401, 317);
-            this.excuseBox.TabIndex = 1;
-            this.excuseBox.Text = "";
-            // 
-            // editExcuseBtn
-            // 
-            this.editExcuseBtn.Enabled = false;
-            this.editExcuseBtn.Location = new System.Drawing.Point(13, 9);
-            this.editExcuseBtn.Name = "editExcuseBtn";
-            this.editExcuseBtn.Size = new System.Drawing.Size(139, 38);
-            this.editExcuseBtn.TabIndex = 4;
-            this.editExcuseBtn.Text = "Редагувати вибачення";
-            this.editExcuseBtn.UseVisualStyleBackColor = true;
-            this.editExcuseBtn.Click += new System.EventHandler(this.editExcuseBtn_Click);
-            // 
-            // saveExcuseBtn
-            // 
-            this.saveExcuseBtn.Enabled = false;
-            this.saveExcuseBtn.Location = new System.Drawing.Point(180, 9);
-            this.saveExcuseBtn.Name = "saveExcuseBtn";
-            this.saveExcuseBtn.Size = new System.Drawing.Size(139, 38);
-            this.saveExcuseBtn.TabIndex = 4;
-            this.saveExcuseBtn.Text = "Зберегти вибачення";
-            this.saveExcuseBtn.UseVisualStyleBackColor = true;
-            this.saveExcuseBtn.Click += new System.EventHandler(this.saveExcuseBtn_Click);
-            // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1141, 564);
             this.Controls.Add(this.splitContainer1);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "MainForm";
+            this.Text = "MainForm";
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -373,15 +385,15 @@
             this.splitContainer4.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
+            this.splitContainer5.Panel1.ResumeLayout(false);
+            this.splitContainer5.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
+            this.splitContainer5.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sentencesBindingSource)).EndInit();
-            this.splitContainer5.Panel1.ResumeLayout(false);
-            this.splitContainer5.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
-            this.splitContainer5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -412,6 +424,7 @@
         private System.Windows.Forms.Button saveExcuseBtn;
         private System.Windows.Forms.Button editExcuseBtn;
         private System.Windows.Forms.RichTextBox excuseBox;
+        private System.Windows.Forms.Button mergeSentsTactsBtn;
     }
 }
 
